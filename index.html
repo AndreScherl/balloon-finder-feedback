@@ -2,71 +2,29 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Ballon gefunden!</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <title>Ballon gefunden</title>
   <style>
     body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    input, textarea, button { width: 100%; margin: 10px 0; padding: 10px; font-size: 16px; }
-    button { background-color: #25D366; color: white; border: none; border-radius: 5px; }
+    input, textarea, button {
+      width: 100%; margin: 10px 0; padding: 10px; font-size: 16px;
+    }
   </style>
 </head>
 <body>
-  <h1>Ballon gefunden!</h1>
+  <h1>Ballon gefunden?</h1>
+  <p>Teile uns mit, wann und wo du den Ballon gefunden hast. Du kannst auch einen Gruß hinterlassen!</p>
 
-  <label>Zeitpunkt:</label>
-  <input type="datetime-local" id="zeitpunkt">
+  <form action="https://formspree.io/f/xldnjaod" method="POST">
+    <label for="location">Fundort:</label>
+    <input type="text" id="location" name="location" required>
 
-  <label>Fundort:</label>
-  <input type="text" id="ort" placeholder="z. B. Köln, Rheinpark">
+    <label for="timestamp">Zeitpunkt:</label>
+    <input type="datetime-local" id="timestamp" name="timestamp" required>
 
-  <label>Grußtext (optional):</label>
-  <textarea id="gruss" rows="4"></textarea>
+    <label for="message">Grußtext (optional):</label>
+    <textarea id="message" name="message" rows="4"></textarea>
 
-  <button onclick="senden()">Senden</button>
-
-  <script>
-    function getParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
-
-    function decrypt(encrypted, key) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(encrypted, key);
-        return bytes.toString(CryptoJS.enc.Utf8);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function senden() {
-      const encrypted = getParam("fizz");
-      const key = getParam("bazz");
-
-      if (!encrypted || !key) {
-        alert("Fehler: Kein gültiger Ballon-Link.");
-        return;
-      }
-
-      const nummer = decrypt(encrypted, key);
-      if (!nummer || !nummer.match(/^\d+$/)) {
-        alert("Telefonnummer konnte nicht entschlüsselt werden.");
-        return;
-      }
-
-      const zeit = document.getElementById('zeitpunkt').value;
-      const ort = document.getElementById('ort').value;
-      const gruss = document.getElementById('gruss').value;
-
-      if (!zeit || !ort) {
-        alert("Bitte Zeit und Ort angeben.");
-        return;
-      }
-
-      const nachricht = `🎈 Ein Ballon wurde gefunden!\n📍 Ort: ${ort}\n🕒 Zeitpunkt: ${zeit}${gruss ? '\n💬 Gruß: ' + gruss : ''}`;
-      const url = `https://wa.me/${nummer}?text=${encodeURIComponent(nachricht)}`;
-
-      window.open(url, '_blank');
-    }
-  </script>
+    <button type="submit">Senden</button>
+  </form>
 </body>
 </html>
