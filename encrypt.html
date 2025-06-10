@@ -1,34 +1,72 @@
-<script>
-  function generateRandomKey(length = 16) {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Ballon-Link erzeugen</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
     }
-    return result;
-  }
+    input, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #qrcode {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ballon-Link & QR-Code erzeugen</h1>
 
-  function generate() {
-    const phone = document.getElementById('phone').value.trim();
-    const paramCode = "fizz";
-    const paramKey = "bazz";
+  <label>Telefonnummer (international, z. B. 4917612345678):</label>
+  <input type="text" id="phone" placeholder="z. B. 4917612345678">
 
-    if (!phone.match(/^\d{10,15}$/)) {
-      alert("Bitte eine gültige Telefonnummer im internationalen Format angeben.");
-      return;
+  <button onclick="generate()">Generieren</button>
+
+  <label>Erzeugte URL:</label>
+  <input type="text" id="finalurl" readonly>
+
+  <div id="qrcode"></div>
+
+  <script>
+    function generateRandomKey(length = 16) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
     }
 
-    const key = generateRandomKey();
-    const encrypted = CryptoJS.AES.encrypt(phone, key).toString();
+    function generate() {
+      const phone = document.getElementById('phone').value.trim();
+      const paramCode = "fizz";
+      const paramKey = "bazz";
 
-    // Automatische Basis-URL
-    const baseurl = `${window.location.origin}${window.location.pathname.replace("encrypt.html", "index.html")}`;
+      if (!phone.match(/^\d{10,15}$/)) {
+        alert("Bitte eine gültige Telefonnummer im internationalen Format angeben.");
+        return;
+      }
 
-    const url = `${baseurl}?${paramCode}=${encodeURIComponent(encrypted)}&${paramKey}=${encodeURIComponent(key)}`;
-    document.getElementById('finalurl').value = url;
+      const key = generateRandomKey();
+      const encrypted = CryptoJS.AES.encrypt(phone, key).toString();
 
-    // Nur QR-Code generieren, wenn die URL valide ist
-    if (url.length > 0) {
+      // Automatisch Basis-URL erzeugen (ersetzt "encrypt.html" durch "index.html")
+      const baseurl = `${window.location.origin}${window.location.pathname.replace("encrypt.html", "index.html")}`;
+
+      const url = `${baseurl}?${paramCode}=${encodeURIComponent(encrypted)}&${paramKey}=${encodeURIComponent(key)}`;
+      document.getElementById('finalurl').value = url;
+
+      // QR-Code erzeugen
       QRCode.toCanvas(document.getElementById("qrcode"), url, function (error) {
         if (error) {
           console.error("QR-Code Fehler:", error);
@@ -36,5 +74,6 @@
         }
       });
     }
-  }
-</script>
+  </script>
+</body>
+</html>
