@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Ballon-Link erzeugen</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, button { width: 100%; margin: 10px 0; padding: 10px; font-size: 16px; }
+    #qrcode { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Ballon-Link & QR-Code erzeugen</h1>
+
+  <label>Telefonnummer (international, z. B. 4917612345678):</label>
+  <input type="text" id="phone">
+
+  <label>Basis-URL (z. B. https://andrescherl.github.io/ballon-finder"):</label>
+  <input type="text" id="baseurl" value="https://andrescherl.github.io/ballon-finder">
+
+  <button onclick="generate()">Generieren</button>
+
+  <label>Erzeugte URL:</label>
+  <input type="text" id="finalurl" readonly>
+
+  <div id="qrcode"></div>
+
+  <script>
+    function generateRandomKey(length = 16) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function generate() {
+      const phone = document.getElementById('phone').value.trim();
+      const baseurl = document.getElementById('baseurl').value.trim();
+      const paramCode = "fizz";
+      const paramKey = "bazz";
+
+      if (!phone || !baseurl) {
+        alert("Bitte Telefonnummer und URL angeben.");
+        return;
+      }
+
+      const key = generateRandomKey();
+      const encrypted = CryptoJS.AES.encrypt(phone, key).toString();
+
+      const url = `${baseurl}?${paramCode}=${encodeURIComponent(encrypted)}&${paramKey}=${encodeURIComponent(key)}`;
+      document.getElementById('finalurl').value = url;
+
+      QRCode.toCanvas(document.getElementById("qrcode"), url, function (error) {
+        if (error) console.error(error);
+      });
+    }
+  </script>
+</body>
+</html>
